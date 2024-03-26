@@ -24,6 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # when empty sub url is given, it set to open home function from views
     path('', views.home, name='home')
-    # same but using regex
-    path(r'^$', views.home, name='home')
+    
+    # same as above but using regex
+    # path(r'^$', views.home, name='home')
 ]
