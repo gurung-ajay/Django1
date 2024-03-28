@@ -26,5 +26,5 @@ urlpatterns = [
     path('', views.home, name='home')
     
     # same as above but using regex
-    # path(r'^$', views.home, name='home')
+    # re_path(r'^$', views.home, name='home')
 ]
