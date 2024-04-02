@@ -23,8 +23,16 @@ from boards import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     # when empty sub url is given, it set to open home function from views
-    path('', views.home, name='home')
+    path('', views.home, name='home'),
     
     # same as above but using regex
     # re_path(r'^$', views.home, name='home')
+    
+    # regex path. boards is static but this part((?P<pk>\d+)) means it can have any value such as ip/boards/1, ip/boards/2, etc
+    re_path(r'^boards/(?P<pk>\d+)/$', views.board_topics, name='board_topics'),
+    
+    # url link for about page
+    re_path(r'^about/$', views.about, name='about')
+    # alternative: using path
+    # path('/about/', views.about, name='about')
 ]

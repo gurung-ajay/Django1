@@ -1,0 +1,21 @@
+
+<!-- to load static files-->
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <!-- to link css from static-->
+        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+        <title>{{ board.name }}</title>
+    </head>
+    <body>
+
+        <div class="container">
+            <ol class="breadcrumb my-4">
+                <li class="breadcrumb-item">Boards</li>
+                <li class="breadcrumb-item active">{{ board.name }}</li>
+            </ol>  
+        </div>
+    </body>
+</html>
