@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from .models import Board
 
@@ -27,7 +27,10 @@ def home(request):
 # and when opened ip/boards/2/ it opens value of objects with primary key 2 "Python"
 def board_topics(request, pk):
     # Accessing primary key from board objects to uniquely identify each objects
-    board = Board.objects.get(pk=pk)
+    try:
+        board = Board.objects.get(pk=pk)
+    except Board.DoesNotExist:
+        raise Http404
     return render(request, 'topics.html', {'board': board})
 
 def about(request):

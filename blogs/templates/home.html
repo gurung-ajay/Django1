@@ -30,7 +30,8 @@
                     <!-- Printing row value for each board objects -->
                     <tr>
                         <td>
-                            {{ board.name }}<br>
+                            <!--new change. This allows to click on board names and access their board_topics page. Hyperlink.-->
+                            <a href="{% url 'board_topics' board.pk %}">{{ board.name }}</a>
                             <small class="text-muted d-block">{{ board.description }}</small>
                         </td>
                         <td class="align-middle">0</td>
