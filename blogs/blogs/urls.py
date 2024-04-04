@@ -29,10 +29,25 @@ urlpatterns = [
     # re_path(r'^$', views.home, name='home')
     
     # regex path. boards is static but this part((?P<pk>\d+)) means it can have any value such as ip/boards/1, ip/boards/2, etc
+    # which will be passed as primary key for board model (see board_topics views for more detail)
     re_path(r'^boards/(?P<pk>\d+)/$', views.board_topics, name='board_topics'),
     
     # url link for about page
-    re_path(r'^about/$', views.about, name='about')
+    re_path(r'^about/$', views.about, name='about'),
     # alternative: using path
-    # path('/about/', views.about, name='about')
+    # path('/about/', views.about, name='about'),
+    
+    # ?P assigns variables to <var>
+    # \d means digit 0-9, + means one or more occurences
+    re_path(r'^questions/(?P<pk>\d+)/$', views.question, name='question'),
+    # - means you can insert - sign in that sub-url section, /w  means only char a-z, A-Z, 0-9 
+    # if - is not stated, you can write 'helloworld' but not 'hello-world' as - will not be supported
+    re_path(r'^posts/(?P<slug>[-\w]+)/$', views.post, name='post'),
+    # here, - separated first and second potion as slug and pk. 
+    # You may or may not choose to put - in slug value, it wont be a problem
+    re_path(r'^blog/(?P<slug>[-\w]+)-(?P<pk>\d+)/$', views.blog_post, name='blog_post'),
+    # [\w.@+-] this means that any characters(., @, +, -) inside [] are supported as part of username
+    re_path(r'^profile/(?P<username>[\w.@+-]+)/$', views.user_profile, name='user_profile'),
+    # support exactly 4 occurences of digit ranging from 0 to 9
+    re_path(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive, name='year'),
 ]

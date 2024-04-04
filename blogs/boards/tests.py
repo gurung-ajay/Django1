@@ -7,7 +7,7 @@ from .models import Board
 # Create your tests here.
 
 # To test if home page is working properly
-class HomeTest(TestCase):
+class HomeTests(TestCase):
     def setUp(self):
         self.board = Board.objects.create(name='Django', description='Django.board')
         url = reverse('home')

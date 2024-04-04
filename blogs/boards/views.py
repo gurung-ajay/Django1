@@ -35,3 +35,19 @@ def board_topics(request, pk):
 
 def about(request):
     return render(request, 'about.html')
+
+
+def question(request, pk):
+    return HttpResponse(f"Question: {pk}")
+
+def post(request, slug):
+    return HttpResponse(f"Slug: {slug}")
+
+def blog_post(request, slug, pk):
+    return HttpResponse(f"Blog_post: {slug} and PK: {pk}")
+
+def user_profile(request, username):
+    return HttpResponse(f"User Name: {username}")
+
+def year_archive(request, year):
+    return HttpResponse(f"Year: {year}")
