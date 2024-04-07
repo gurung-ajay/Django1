@@ -50,4 +50,8 @@ urlpatterns = [
     re_path(r'^profile/(?P<username>[\w.@+-]+)/$', views.user_profile, name='user_profile'),
     # support exactly 4 occurences of digit ranging from 0 to 9
     re_path(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive, name='year'),
+    
+    # to link to each board topics page for adding form to add new topic for that particular board 
+    # by accessing the board primary key
+    re_path(r'^boards/(?P<pk>\d+)/new/$', views.new_topic, name='new_topic'),
 ]

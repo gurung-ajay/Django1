@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404
 
 from .models import Board
@@ -51,3 +51,7 @@ def user_profile(request, username):
 
 def year_archive(request, year):
     return HttpResponse(f"Year: {year}")
+
+def new_topic(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    return render(request, 'new_topic.html', {'board': board})
