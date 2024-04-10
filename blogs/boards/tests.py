@@ -72,6 +72,22 @@ class BoardTopicsTests(TestCase):
         homepage_url = reverse('home')
         self.assertContains(response, 'href="{0}"'.format(homepage_url))
         
+    def test_board_topics_view_contains_navigation_links(self):
+        # get url from views using reverse for following:
+        board_topics_url = reverse('board_topics', kwargs={'pk': 1})
+        homepage_url = reverse('home')
+        new_topic_url = reverse('new_topic', kwargs={'pk': 1})
+        
+        response = self.client.get(board_topics_url)
+        
+        # check if the html linked to board_topics, topics.html (which is the response from board_topics_url), 
+        # contains href link for opening homepage_url
+        self.assertContains(response, 'href="{0}"'.format(homepage_url))
+        # check if the html linked to board_topics, topics.html (which is the response from board_topics_url), 
+        # contains href link for opening new_topic_url
+        self.assertContains(response, 'href="{0}"'.format(new_topic_url))
+        
+        
 
 class NewTopicTests(TestCase):
     def setUp(self):
