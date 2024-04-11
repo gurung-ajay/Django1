@@ -4,6 +4,7 @@ from django.http import HttpResponse, Http404
 from .models import Board
 from .models import Topic, Post
 from django.contrib.auth.models import User
+from .forms import NewTopicForm
 
 # Create your views here.
 
@@ -54,34 +55,55 @@ def user_profile(request, username):
 def year_archive(request, year):
     return HttpResponse(f"Year: {year}")
 
-def new_topic(request, pk):
-    # similar logic as board_topics view funcion
-    # get board objects for given pk and if not found give 404 error
-    board = get_object_or_404(Board, pk=pk)
+# def new_topic(request, pk):
+#     # similar logic as board_topics view funcion
+#     # get board objects for given pk and if not found give 404 error
+#     board = get_object_or_404(Board, pk=pk)
     
-    # when user inserts data and click post button, the post method will send data through http request
-    # these data will be captured and stored here
-    if request.method=="POST":
-        subject = request.POST['subject']
-        message = request.POST['message']
+#     # when user inserts data and click post button, the post method will send data through http request
+#     # these data will be captured and stored here
+#     if request.method=="POST":
+#         subject = request.POST['subject']
+#         message = request.POST['message']
         
-        user = User.objects.first() # TODO: get the currently logged in user
+#         user = User.objects.first() # TODO: get the currently logged in user
         
-        # add data to the topic model
-        topic = Topic.objects.create(
-            subject = subject,
-            board = board,
-            starter = user
-        )
+#         # add data to the topic model
+#         topic = Topic.objects.create(
+#             subject = subject,
+#             board = board,
+#             starter = user
+#         )
 
-        # add data to the post model
-        post = Post.objects.create(
-            message = message,
-            topic = topic,
-            created_by = user
-        )
+#         # add data to the post model
+#         post = Post.objects.create(
+#             message = message,
+#             topic = topic,
+#             created_by = user
+#         )
         
-        return redirect('board_topics', pk=board.pk) # TODO: redirect to the created topic page
+#         return redirect('board_topics', pk=board.pk) # TODO: redirect to the created topic page
     
-    return render(request, 'new_topic.html', {'board': board})
+#     return render(request, 'new_topic.html', {'board': board})
+
+# REPLACE new_topic as:
+def new_topic(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    user = User.objects.first()  # TODO: get the currently logged in user
+    if request.method == 'POST':
+        form = NewTopicForm(request.POST)
+        if form.is_valid():
+            topic = form.save(commit=False)
+            topic.board = board
+            topic.starter = user
+            topic.save()
+            post = Post.objects.create(
+                message=form.cleaned_data.get('message'),
+                topic=topic,
+                created_by=user
+            )
+            return redirect('board_topics', pk=board.pk)  # TODO: redirect to the created topic page
+    else:
+        form = NewTopicForm()
+    return render(request, 'new_topic.html', {'board': board, 'form': form})
 
