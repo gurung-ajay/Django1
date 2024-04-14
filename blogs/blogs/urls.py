@@ -19,6 +19,8 @@ from django.urls import path
 from django.urls import include, re_path
 # import views from boards app
 from boards import views
+# accounts views
+from accounts import views as accounts_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -54,4 +56,6 @@ urlpatterns = [
     # to link to each board topics page for adding form to add new topic for that particular board 
     # by accessing the board primary key
     re_path(r'^boards/(?P<pk>\d+)/new/$', views.new_topic, name='new_topic'),
+    
+    re_path(r'^signup/$', accounts_views.signup, name='signup'),
 ]

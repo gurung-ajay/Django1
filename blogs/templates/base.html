@@ -1,34 +1,28 @@
-
-<!-- to load static files-->
-{% load static %}
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset='utf-8'>
-        <!-- font link from fonts.google.com -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Peralta&display=swap" rel="stylesheet">
-        <!-- to link css from static-->
-        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-        <link rel="stylesheet" href="{% static 'css/app.css' %}">
-        <title>{% block title %}Django Boards{% endblock %}</title>
-    </head>
-
-    <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" href="{% url 'home' %}">Django Boards</a>
-            </div>
-        </nav>
-
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Django Boards{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css?family=Peralta" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    {% block stylesheet %}{% endblock %}  <!-- HERE -->
+  </head>
+  <body>
+    {% block body %}  <!-- HERE -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <ol class="breadcrumb my-4">
-                {% block breadcrumb %}
-                {% endblock %}
-            </ol>
-            {% block content %}
-            {% endblock %}  
+          <a class="navbar-brand" href="{% url 'home' %}">Django Boards</a>
         </div>
-    </body>
+      </nav>
+      <div class="container">
+        <ol class="breadcrumb my-4">
+          {% block breadcrumb %}
+          {% endblock %}
+        </ol>
+        {% block content %}
+        {% endblock %}
+      </div>
+    {% endblock body %}  <!-- AND HERE -->
+  </body>
 </html>

@@ -89,6 +89,8 @@ def year_archive(request, year):
 # REPLACE new_topic as:
 def new_topic(request, pk):
     board = get_object_or_404(Board, pk=pk)
+    
+    # For demonstration purposes, fetch the first user from the database.
     user = User.objects.first()  # TODO: get the currently logged in user
     if request.method == 'POST':
         form = NewTopicForm(request.POST)

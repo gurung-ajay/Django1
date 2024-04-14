@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     
     "boards",
-    "widget_tweaks"
+    "widget_tweaks",
+    "accounts",
 ]
 
 MIDDLEWARE = [

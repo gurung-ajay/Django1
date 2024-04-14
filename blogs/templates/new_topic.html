@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-<form method="post" novalidate>
+  <form method="post" novalidate>
     {% csrf_token %}
     <!--inheriting from form.html inside templates/includes/forms.html-->
     {% include "includes/form.html" %}
