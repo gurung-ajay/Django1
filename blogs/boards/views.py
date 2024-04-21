@@ -7,6 +7,16 @@ from django.contrib.auth.models import User
 from .forms import NewTopicForm, PostForm
 from django.contrib.auth.decorators import login_required
 
+from django.db.models import Count
+
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from django.views.generic import UpdateView
+from django.utils import timezone
+
+from django.utils.decorators import method_decorator
+
+
 # Create your views here.
 
 # logic for homepage
@@ -30,12 +40,9 @@ def home(request):
 # This view is for when user opens url link ip/boards/1/ it opens value of objects with primamry key 1, "Django",
 # and when opened ip/boards/2/ it opens value of objects with primary key 2 "Python"
 def board_topics(request, pk):
-    # Accessing primary key from board objects to uniquely identify each objects
-    try:
-        board = Board.objects.get(pk=pk)
-    except Board.DoesNotExist:
-        raise Http404
-    return render(request, 'topics.html', {'board': board})
+    board = get_object_or_404(Board, pk=pk)
+    topics = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+    return render(request, 'topics.html', {'board': board, 'topics': topics})
 
 def about(request):
     return render(request, 'about.html')
@@ -115,6 +122,8 @@ def new_topic(request, pk):
 
 def topic_posts(request, pk, topic_pk):
     topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
+    topic.views += 1
+    topic.save()
     return render(request, 'topic_posts.html', {'topic': topic})
 
 @login_required
@@ -131,3 +140,31 @@ def reply_topic(request, pk, topic_pk):
     else:
         form = PostForm()
     return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
+
+
+
+# CLASS BASED VIEWS
+class NewPostView(CreateView):
+    model = Post
+    form_class = PostForm
+    success_url = reverse_lazy('post_list')
+    template_name = 'new_post.html'
+    
+@method_decorator(login_required, name='dispatch')
+class PostUpdateView(UpdateView):
+    model = Post
+    fields = ('message', )
+    template_name = 'edit_post.html'
+    pk_url_kwarg = 'post_pk'
+    context_object_name = 'post'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(created_by=self.request.user)
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.updated_by = self.request.user
+        post.updated_at = timezone.now()
+        post.save()
+        return redirect('topic_posts', pk=post.topic.board.pk, topic_pk=post.topic.pk)

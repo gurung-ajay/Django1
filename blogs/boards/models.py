@@ -10,6 +10,12 @@ class Board(models.Model):
     def __str__(self):
         return self.name
     
+    def get_posts_count(self):
+        return Post.objects.filter(topic__board=self).count()
+
+    def get_last_post(self):
+        return Post.objects.filter(topic__board=self).order_by('-created_at').first()
+    
 class Topic(models.Model):
     subject = models.CharField(max_length=255)
     last_updated = models.DateTimeField(auto_now_add=True)  # auto_now_add adds time as when the data was inserted
@@ -18,6 +24,7 @@ class Topic(models.Model):
     # on_delete=models.CASCADE deletes the row associated to the board id in this model when that board is deleted.
     starter = models.ForeignKey(User, related_name='topics', on_delete=models.CASCADE)  
     # related_name = 'topics' is the method name from the entity User. Look at the Class Diagram for guide
+    views = models.PositiveIntegerField(default=0)
     
     def __str__(self):
         return self.subject
