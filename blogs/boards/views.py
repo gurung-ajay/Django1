@@ -15,33 +15,41 @@ from django.views.generic import UpdateView
 from django.utils import timezone
 
 from django.utils.decorators import method_decorator
+from django.views.generic import ListView
+from .models import Board
+
+from django.db.models import Count
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 # Create your views here.
 
-# logic for homepage
-def home(request):
-    # Response of logic
-    
-    # access board objects(data) from database
-    boards = Board.objects.all()
-    #boards_names = []
-    # store board names using loop in list
-    #for board in boards:
-    #    boards_names.append(board.name)
-        
-    # joins boards_names from list as one string    
-    #response_html = '<br>'.join(boards_names)
-    
-    
-    # render home.html and send boards variable data
-    return render(request, 'home.html', {'boards' : boards})
+# replacement for classbased view for home
+class BoardListView(ListView):
+    model = Board
+    context_object_name = 'boards'
+    template_name = 'home.html'
+
 
 # This view is for when user opens url link ip/boards/1/ it opens value of objects with primamry key 1, "Django",
 # and when opened ip/boards/2/ it opens value of objects with primary key 2 "Python"
 def board_topics(request, pk):
     board = get_object_or_404(Board, pk=pk)
-    topics = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+    queryset = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(queryset, 20) # displays 20 data in a page at once
+
+    try:
+        topics = paginator.page(page)
+    except PageNotAnInteger:
+        # fallback to the first page
+        topics = paginator.page(1)
+    except EmptyPage:
+        # probably the user tried to add a page number
+        # in the url, so we fallback to the last page
+        topics = paginator.page(paginator.num_pages)
+
     return render(request, 'topics.html', {'board': board, 'topics': topics})
 
 def about(request):
@@ -126,6 +134,41 @@ def topic_posts(request, pk, topic_pk):
     topic.save()
     return render(request, 'topic_posts.html', {'topic': topic})
 
+
+class TopicListView(ListView):
+    model = Topic
+    context_object_name = 'topics'
+    template_name = 'topics.html'
+    paginate_by = 20    # number of data in a page displayed at once
+
+    def get_context_data(self, **kwargs):
+        kwargs['board'] = self.board
+        return super().get_context_data(**kwargs)
+
+    def get_queryset(self):
+        self.board = get_object_or_404(Board, pk=self.kwargs.get('pk'))
+        queryset = self.board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+        return queryset
+    
+    
+class PostListView(ListView):
+    model = Post
+    context_object_name = 'posts'
+    template_name = 'topic_posts.html'
+    paginate_by = 2
+
+    def get_context_data(self, **kwargs):
+        self.topic.views += 1
+        self.topic.save()
+        kwargs['topic'] = self.topic
+        return super().get_context_data(**kwargs)
+
+    def get_queryset(self):
+        self.topic = get_object_or_404(Topic, board__pk=self.kwargs.get('pk'), pk=self.kwargs.get('topic_pk'))
+        queryset = self.topic.posts.order_by('created_at')
+        return queryset
+
+
 @login_required
 def reply_topic(request, pk, topic_pk):
     topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
@@ -149,6 +192,7 @@ class NewPostView(CreateView):
     form_class = PostForm
     success_url = reverse_lazy('post_list')
     template_name = 'new_post.html'
+   
     
 @method_decorator(login_required, name='dispatch')
 class PostUpdateView(UpdateView):
